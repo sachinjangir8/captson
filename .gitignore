@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual envs
+venv/
+.env
+.venv/
+env/
+
+# Data (large binary files — use DVC or cloud storage)
+data/raw/
+data/processed/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Model weights
+checkpoints/*.pth
+checkpoints/*.pt
+checkpoints/*.ckpt
+!checkpoints/.gitkeep
+
+# Logs & outputs
+logs/
+outputs/
+*.log
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key
