@@ -1,6 +1,6 @@
 """
 API Schemas
------------
+--------------------------------
 @python-engineer
 
 Pydantic v2 models for request/response validation.
