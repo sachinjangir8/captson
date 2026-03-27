@@ -12,6 +12,7 @@ Endpoints:
 import os
 import time
 import tempfile
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -19,6 +20,7 @@ import yaml
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
 from .schemas import PredictionResponse, HealthResponse, ModelInfoResponse
@@ -41,6 +43,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Static Files Setup (Video Serving) ────────────────────────────────
+
+# Create uploads directory if it doesn't exist
+UPLOADS_DIR = Path("uploads")
+UPLOADS_DIR.mkdir(exist_ok=True)
+
+# Mount static files for serving uploaded videos
+try:
+    app.mount("/videos", StaticFiles(directory=str(UPLOADS_DIR)), name="videos")
+    logger.info(f"Static files mounted at /videos from {UPLOADS_DIR}")
+except Exception as e:
+    logger.error(f"Failed to mount static files: {e}")
 
 # ── Globals ───────────────────────────────────────────────────────────
 
@@ -94,6 +109,63 @@ def get_predictor() -> DeepfakePredictor:
 
 
 # ── Routes ────────────────────────────────────────────────────────────
+
+@app.post(
+    "/upload",
+    tags=["Upload"],
+    summary="Upload video file",
+    description="Upload a video file for storage and later analysis",
+)
+async def upload_video(file: UploadFile = File(...)):
+    """
+    Upload a video file to the server.
+    
+    - **file**: Video file (MP4, AVI, MOV, MKV, WebM)
+    - Returns: URL to access the uploaded video
+    """
+    # Validate extension
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=415,
+            detail=f"Unsupported file type '{ext}'. Allowed: {sorted(ALLOWED_EXTENSIONS)}",
+        )
+    
+    # Read and check file size
+    content = await file.read()
+    size_mb = len(content) / (1024 * 1024)
+    if size_mb > MAX_FILE_SIZE_MB:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large ({size_mb:.1f} MB). Max: {MAX_FILE_SIZE_MB} MB",
+        )
+    
+    # Generate unique filename to avoid conflicts
+    import uuid
+    unique_filename = f"{uuid.uuid4().hex}{ext}"
+    file_location = UPLOADS_DIR / unique_filename
+    
+    # Save file
+    try:
+        with open(file_location, "wb") as buffer:
+            buffer.write(content)
+        
+        logger.info(f"Video uploaded: {unique_filename} ({size_mb:.1f} MB)")
+        
+        # Return accessible URL
+        video_url = f"http://localhost:8000/videos/{unique_filename}"
+        
+        return {
+            "filename": file.filename,
+            "saved_filename": unique_filename,
+            "video_url": video_url,
+            "size_mb": round(size_mb, 2),
+            "format": ext,
+        }
+    except Exception as e:
+        logger.error(f"Upload failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
 
 @app.post(
     "/detect-deepfake",

@@ -22,6 +22,7 @@ from loguru import logger
 from ..preprocessing.frame_extractor import FrameExtractor
 from ..preprocessing.face_detector import FaceDetector
 from ..models.model_factory import load_checkpoint
+from ..evaluation.xai_explainer import XAIExplainer, ExplanationAggregator
 
 
 # ---------------------------------------------------------
@@ -77,11 +78,13 @@ class DeepfakePredictor:
         max_frames: int = 30,
         aggregation: str = "mean",
         fake_threshold: float = 0.5,
+        enable_xai: bool = True,  # NEW: Enable explainability
     ):
 
         self.model_type = model_type
         self.aggregation = aggregation
         self.fake_threshold = fake_threshold
+        self.enable_xai = enable_xai
 
         if device is None:
             self.device = torch.device(
@@ -113,6 +116,12 @@ class DeepfakePredictor:
             margin=0.3,
             device=str(self.device)
         )
+        
+        # NEW: XAI explainer
+        if self.enable_xai:
+            self.xai_explainer = XAIExplainer()
+            self.xai_aggregator = ExplanationAggregator()
+            logger.info("XAI explainability enabled")
 
         logger.info(f"DeepfakePredictor ready on {self.device}")
 
@@ -163,17 +172,25 @@ class DeepfakePredictor:
             raise ValueError("No frames extracted")
 
         frame_probs = []
+        frame_images = []  # NEW: Store frames for XAI
         visualization_frame = None
+        faces_detected = True
 
-        for frame in frames:
+        for idx, frame in enumerate(frames):
 
             face = self.face_detector.detect_face(frame)
 
             if face is None:
+                faces_detected = False
                 continue
 
             prob = self._predict_face(face)
             frame_probs.append(prob)
+            
+            # NEW: Store frame for XAI (convert to RGB)
+            if self.enable_xai:
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame_images.append(frame_rgb)
 
             # Save one frame for visualization
             if visualization_frame is None:
@@ -200,13 +217,19 @@ class DeepfakePredictor:
                 prob = self._predict_face(rgb)
 
                 frame_probs.append(prob)
+                
+                # Store for XAI
+                if self.enable_xai:
+                    frame_images.append(rgb)
 
         elapsed_ms = (time.time() - t0) * 1000
 
         return self._format_result(
             frame_probs,
             elapsed_ms,
-            visualization_frame
+            visualization_frame,
+            frame_images=frame_images if self.enable_xai else None,
+            faces_detected=faces_detected
         )
 
     # ---------------------------------------------------------
@@ -279,7 +302,9 @@ class DeepfakePredictor:
         self,
         probs: List[float],
         elapsed_ms: float,
-        visualization_frame=None
+        visualization_frame=None,
+        frame_images: Optional[List[np.ndarray]] = None,
+        faces_detected: bool = True
     ) -> Dict:
 
         score = self._aggregate(probs)
@@ -295,9 +320,35 @@ class DeepfakePredictor:
             "frame_scores": [round(p, 4) for p in probs],
             "frames_analyzed": len(probs),
             "processing_time_ms": round(elapsed_ms, 1),
+            "faces_detected": faces_detected,
         }
 
         if visualization_frame is not None:
             result["visualization_frame"] = visualization_frame.tolist()
+        
+        # NEW: Add XAI explanations
+        if self.enable_xai and hasattr(self, 'xai_aggregator'):
+            try:
+                xai_output = self.xai_aggregator.aggregate(
+                    prediction=result["prediction"],
+                    confidence=confidence,
+                    frame_scores=probs,
+                    frame_images=frame_images
+                )
+                
+                # Merge XAI output into result
+                result.update({
+                    "explanations": xai_output["explanations"],
+                    "confidence_breakdown": xai_output["confidence_breakdown"],
+                    "suspicious_frames": xai_output["suspicious_frames"],
+                    "temporal_inconsistency_detected": xai_output["temporal_inconsistency_detected"],
+                    "frame_analysis": xai_output["frame_analysis"],
+                    "warnings": xai_output["warnings"],
+                })
+                
+                logger.info(f"XAI explanations generated: {len(xai_output['explanations'])} reasons")
+            except Exception as e:
+                logger.error(f"XAI explanation failed: {e}")
+                # Continue without XAI if it fails
 
         return result

@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import VideoDropzone from '../components/VideoDropzone'
 import ResultCard from '../components/ResultCard'
+import ExplanationPanel from '../components/ExplanationPanel'  // NEW
+import FrameTimeline from '../components/FrameTimeline'  // NEW
+import ConfidenceBreakdown from '../components/ConfidenceBreakdown'  // NEW
 import Alert from '../components/Alert'
 import { useVideoAnalysis } from '../hooks/useVideoAnalysis'
 
@@ -98,16 +101,21 @@ export default function DashboardPage() {
             <AnimatePresence>
               {videoURL && (
                 <motion.div
+                  key="video-preview"  // Force re-render on URL change
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                 >
                   <p className="text-gray-400 text-sm mb-2 font-medium">Preview</p>
+                  {/* CRITICAL FIX: Use key={videoURL} to force refresh when URL changes */}
                   <video
-                    src={videoURL}
+                    key={videoURL}
                     controls
                     className="w-full rounded-xl border border-white/10 max-h-48 object-cover"
-                  />
+                  >
+                    <source src={videoURL} type={videoFile?.type || 'video/mp4'} />
+                    Your browser does not support the video tag.
+                  </video>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -174,31 +182,61 @@ export default function DashboardPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
-            className="glass-card p-6"
+            className="space-y-6"
           >
-            <h2 className="text-xl font-semibold text-white mb-5 flex items-center gap-2">
-              <span>📊</span> Analysis Result
-            </h2>
+            {/* Main Result Card */}
+            <div className="glass-card p-6">
+              <h2 className="text-xl font-semibold text-white mb-5 flex items-center gap-2">
+                <span>📊</span> Analysis Result
+              </h2>
 
-            <AnimatePresence mode="wait">
-              {result ? (
-                <ResultCard key="result" result={result} />
-              ) : (
-                <motion.div
-                  key="placeholder"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center h-64 text-center"
-                >
-                  <div className="text-5xl mb-4 opacity-30">🎭</div>
-                  <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-                    Upload a video and click <strong className="text-gray-400">Analyze Video</strong>.
-                    Results will appear here with confidence scores.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              <AnimatePresence mode="wait">
+                {result ? (
+                  <ResultCard key="result" result={result} />
+                ) : (
+                  <motion.div
+                    key="placeholder"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col items-center justify-center h-64 text-center"
+                  >
+                    <div className="text-5xl mb-4 opacity-30">🎭</div>
+                    <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                      Upload a video and click <strong className="text-gray-400">Analyze Video</strong>.
+                      Results will appear here with confidence scores.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* NEW: XAI Components (only show if we have results) */}
+            {result && (
+              <>
+                {/* Frame Timeline */}
+                {result.frame_scores && result.frame_scores.length > 0 && (
+                  <FrameTimeline
+                    frameScores={result.frame_scores}
+                    suspiciousFrames={result.suspicious_frames}
+                  />
+                )}
+
+                {/* Explanation Panel */}
+                {result.explanations && result.explanations.length > 0 && (
+                  <ExplanationPanel
+                    explanations={result.explanations}
+                    prediction={result.prediction}
+                  />
+                )}
+
+                {/* Confidence Breakdown & Warnings */}
+                <ConfidenceBreakdown
+                  confidenceBreakdown={result.confidence_breakdown}
+                  warnings={result.warnings}
+                />
+              </>
+            )}
           </motion.div>
         </div>
 

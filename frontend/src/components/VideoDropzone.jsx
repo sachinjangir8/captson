@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -31,9 +31,14 @@ function formatBytes(bytes) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function VideoDropzone({ videoFile, onFileSelect, onReset, disabled }) {
+  const [isDragging, setIsDragging] = useState(false)
+  
   const onDrop = useCallback(
     (acceptedFiles) => {
-      if (acceptedFiles.length > 0) onFileSelect(acceptedFiles[0])
+      if (acceptedFiles.length > 0) {
+        console.log('File dropped:', acceptedFiles[0].name)
+        onFileSelect(acceptedFiles[0])
+      }
     },
     [onFileSelect]
   )
@@ -43,6 +48,10 @@ export default function VideoDropzone({ videoFile, onFileSelect, onReset, disabl
     accept: { 'video/*': ['.mp4', '.avi', '.mov', '.webm', '.mkv'] },
     multiple: false,
     disabled,
+    onDragEnter: () => setIsDragging(true),
+    onDragLeave: () => setIsDragging(false),
+    onDropAccepted: () => setIsDragging(false),
+    onDropRejected: () => setIsDragging(false),
   })
 
   return (
