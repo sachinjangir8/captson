@@ -2,7 +2,7 @@
 Evaluation Metrics
 ------------------
 @data-scientist | @ml-engineer
-
+see it carefully
 Comprehensive evaluation: accuracy, precision, recall, F1, ROC-AUC.
 Includes plotting utilities for ROC curve and confusion matrix.
 """
