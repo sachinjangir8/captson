@@ -22,8 +22,7 @@ export default function ConfidenceBreakdown({ confidenceBreakdown, warnings }) {
       {/* Confidence Breakdown */}
       {confidenceBreakdown && (
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <span>📊</span>
+          <h3 className="text-lg font-medium text-white mb-4">
             Confidence Breakdown
           </h3>
           
@@ -63,8 +62,7 @@ export default function ConfidenceBreakdown({ confidenceBreakdown, warnings }) {
           animate={{ opacity: 1, scale: 1 }}
           className="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-6"
         >
-          <h3 className="text-lg font-bold text-yellow-300 mb-3 flex items-center gap-2">
-            <span>⚠️</span>
+          <h3 className="text-lg font-medium text-yellow-300 mb-3">
             Important Notices
           </h3>
           
@@ -94,23 +92,23 @@ function MetricBar({ label, value, description, color }) {
   
   const colorClasses = {
     blue: {
-      bg: 'bg-blue-500/20',
-      fill: 'from-blue-500 to-cyan-500',
+      bg: 'bg-blue-500/10',
+      fill: 'bg-blue-500',
       text: 'text-blue-400'
     },
     purple: {
-      bg: 'bg-purple-500/20',
-      fill: 'from-purple-500 to-pink-500',
+      bg: 'bg-purple-500/10',
+      fill: 'bg-purple-500',
       text: 'text-purple-400'
     },
     green: {
-      bg: 'bg-green-500/20',
-      fill: 'from-green-500 to-emerald-500',
+      bg: 'bg-green-500/10',
+      fill: 'bg-green-500',
       text: 'text-green-400'
     },
     red: {
-      bg: 'bg-red-500/20',
-      fill: 'from-red-500 to-orange-500',
+      bg: 'bg-red-500/10',
+      fill: 'bg-red-500',
       text: 'text-red-400'
     }
   }
@@ -130,7 +128,7 @@ function MetricBar({ label, value, description, color }) {
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className={`h-full bg-gradient-to-r ${colors.fill} rounded-full`}
+          className={`h-full ${colors.fill} rounded-full`}
         />
       </div>
       

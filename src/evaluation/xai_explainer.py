@@ -253,7 +253,7 @@ class XAIExplainer:
             'average_confidence': round(avg_confidence, 4),
             'temporal_coherence_score': round(temporal_coherence, 4),
             'artifact_detection_score': round(artifact_score, 4),
-            'overall_confidence': round(confidence, 4)
+            'overall_confidence': round(avg_confidence, 4)
         }
     
     def generate_heatmap(

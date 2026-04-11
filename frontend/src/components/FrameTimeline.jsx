@@ -58,7 +58,7 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
               : 'bg-white/5 text-gray-400 border border-white/10'
           }`}
         >
-          {showHeatmap ? '🔥 Heatmap ON' : '⬜ Heatmap OFF'}
+          {showHeatmap ? 'Hide Heatmap' : 'Show Heatmap'}
         </button>
       </div>
 
@@ -191,13 +191,13 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Classification:</span>
                   <span className="font-semibold text-white">
-                    {frameScores[selectedFrame] > 0.5 ? '🚨 FAKE' : '✅ REAL'}
+                    {frameScores[selectedFrame] > 0.5 ? 'FAKE' : 'REAL'}
                   </span>
                 </div>
                 {suspiciousFrames?.includes(selectedFrame) && (
                   <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg">
                     <p className="text-red-300 text-xs">
-                      ⚠️ This frame was flagged as suspicious
+                      This frame was flagged as suspicious
                     </p>
                   </div>
                 )}

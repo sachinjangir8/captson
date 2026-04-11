@@ -10,12 +10,11 @@ import Alert from '../components/Alert'
 import { useVideoAnalysis } from '../hooks/useVideoAnalysis'
 
 // ── Stat Card ─────────────────────────────────────────────────────────────────
-function StatCard({ icon, label, value }) {
+function StatCard({ label, value }) {
   return (
     <div className="glass-card text-center p-4">
-      <div className="text-2xl mb-1">{icon}</div>
       <div className="text-xl font-bold text-white">{value}</div>
-      <div className="text-gray-400 text-xs mt-0.5">{label}</div>
+      <div className="text-gray-400 text-xs mt-1">{label}</div>
     </div>
   )
 }
@@ -43,9 +42,8 @@ export default function DashboardPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-primary-500/15 border border-primary-500/30
-                          text-primary-300 text-xs font-medium px-3 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20
+                          text-blue-400 text-xs font-medium px-3 py-1.5 rounded-full mb-4">
             AI-Powered Detection
           </div>
           <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-4 leading-tight">
@@ -64,9 +62,9 @@ export default function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="grid grid-cols-3 gap-4 mb-10"
         >
-          <StatCard icon="🎯" label="Accuracy"    value="96.3%" />
-          <StatCard icon="⚡" label="Avg Speed"   value="~8 sec" />
-          <StatCard icon="🎬" label="Formats"     value="MP4/AVI/MOV" />
+          <StatCard label="Accuracy"    value="96.3%" />
+          <StatCard label="Avg Speed"   value="~8 sec" />
+          <StatCard label="Formats"     value="MP4/AVI/MOV" />
         </motion.div>
 
         {/* ── Main Workspace ──────────────────────────────────────────────── */}
@@ -79,8 +77,8 @@ export default function DashboardPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="glass-card p-6 space-y-5"
           >
-            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-              <span>📤</span> Upload Video
+            <h2 className="text-xl font-medium text-white">
+              Upload Video
             </h2>
 
             <VideoDropzone
@@ -111,6 +109,7 @@ export default function DashboardPage() {
                   <video
                     key={videoURL}
                     controls
+                    preload="auto"
                     className="w-full rounded-xl border border-white/10 max-h-48 object-cover"
                   >
                     <source src={videoURL} type={videoFile?.type || 'video/mp4'} />
@@ -131,24 +130,23 @@ export default function DashboardPage() {
                 >
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">
-                      {uploadProgress < 100 ? '⬆️ Uploading…' : '🧠 Analyzing with AI…'}
+                      {uploadProgress < 100 ? 'Uploading...' : 'Analyzing with AI...'}
                     </span>
                     {uploadProgress < 100 && (
-                      <span className="text-primary-400 font-medium">{uploadProgress}%</span>
+                      <span className="text-blue-400 font-medium">{uploadProgress}%</span>
                     )}
                   </div>
                   <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                     {uploadProgress < 100 ? (
                       <motion.div
-                        className="h-full bg-gradient-to-r from-primary-500 to-purple-500 rounded-full"
+                        className="h-full bg-blue-500 rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${uploadProgress}%` }}
                         transition={{ ease: 'linear' }}
                       />
                     ) : (
                       /* Indeterminate bar while AI processes */
-                      <div className="h-full bg-gradient-to-r from-primary-500 to-purple-500
-                                      rounded-full animate-pulse w-full" />
+                      <div className="h-full bg-blue-500 rounded-full animate-pulse w-full" />
                     )}
                   </div>
                 </motion.div>
@@ -166,11 +164,10 @@ export default function DashboardPage() {
               {isLoading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Analyzing…
+                  Analyzing...
                 </>
               ) : (
                 <>
-                  <span>🔍</span>
                   Analyze Video
                 </>
               )}
@@ -186,8 +183,8 @@ export default function DashboardPage() {
           >
             {/* Main Result Card */}
             <div className="glass-card p-6">
-              <h2 className="text-xl font-semibold text-white mb-5 flex items-center gap-2">
-                <span>📊</span> Analysis Result
+              <h2 className="text-xl font-medium text-white mb-5">
+                Analysis Result
               </h2>
 
               <AnimatePresence mode="wait">
@@ -201,7 +198,11 @@ export default function DashboardPage() {
                     exit={{ opacity: 0 }}
                     className="flex flex-col items-center justify-center h-64 text-center"
                   >
-                    <div className="text-5xl mb-4 opacity-30">🎭</div>
+                    <div className="text-gray-600 mb-4">
+                      <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
                     <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
                       Upload a video and click <strong className="text-gray-400">Analyze Video</strong>.
                       Results will appear here with confidence scores.
@@ -250,17 +251,16 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-white text-center mb-8">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { step: '01', icon: '📁', title: 'Upload',   desc: 'Drop or select a video file up to 500 MB in MP4, AVI, MOV, WebM, or MKV format.' },
-              { step: '02', icon: '🧠', title: 'AI Analysis', desc: 'Our EfficientNet model extracts frames and LSTM analyses temporal patterns frame by frame.' },
-              { step: '03', icon: '📋', title: 'Results',  desc: 'Receive a confidence score and detailed verdict on whether the video is real or manipulated.' },
-            ].map(({ step, icon, title, desc }) => (
+              { step: '01', title: 'Upload',   desc: 'Drop or select a video file up to 500 MB in MP4, AVI, MOV, WebM, or MKV format.' },
+              { step: '02', title: 'AI Analysis', desc: 'Our EfficientNet model extracts frames and LSTM analyses temporal patterns frame by frame.' },
+              { step: '03', title: 'Results',  desc: 'Receive a confidence score and detailed verdict on whether the video is real or manipulated.' },
+            ].map(({ step, title, desc }) => (
               <div key={step} className="glass-card p-6 relative overflow-hidden group">
-                <div className="absolute top-4 right-4 text-6xl font-black text-white/5
+                <div className="absolute top-4 right-4 text-3xl font-black text-white/5
                                 group-hover:text-white/10 transition-colors">
                   {step}
                 </div>
-                <div className="text-3xl mb-3">{icon}</div>
-                <h3 className="text-white font-bold text-lg mb-2">{title}</h3>
+                <h3 className="text-white font-medium text-lg mb-2 mt-4">{title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}

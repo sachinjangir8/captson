@@ -11,9 +11,7 @@ export default function ResultCard({ result }) {
   const confidence  = Math.round((result.confidence ?? 0) * 100)
   const label       = isFake ? 'DEEPFAKE DETECTED' : 'AUTHENTIC VIDEO'
 
-  const barColor    = isFake
-    ? 'from-red-500 to-rose-600'
-    : 'from-emerald-400 to-green-500'
+  const barColor    = isFake ? 'bg-red-500' : 'bg-green-500'
 
   const borderColor = isFake ? 'border-red-500/30' : 'border-emerald-500/30'
   const bgColor     = isFake ? 'bg-red-500/10' : 'bg-emerald-500/10'
@@ -41,16 +39,13 @@ export default function ResultCard({ result }) {
           <h3 className={`text-2xl font-bold ${textColor}`}>{label}</h3>
         </div>
 
-        {/* Big icon */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className={`w-16 h-16 rounded-2xl ${isFake ? 'bg-red-500/20' : 'bg-emerald-500/20'}
-                      flex items-center justify-center text-4xl`}
+        <div
+          className={`px-3 py-1 rounded-md text-sm font-semibold border ${
+            isFake ? 'text-red-400 border-red-500/30 bg-red-500/10' : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+          }`}
         >
-          {isFake ? '🚨' : '✅'}
-        </motion.div>
+          {isFake ? 'FAKE' : 'REAL'}
+        </div>
       </div>
 
       {/* Confidence Bar */}
@@ -67,12 +62,9 @@ export default function ResultCard({ result }) {
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${confidence}%` }}
-            transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-            className={`h-full bg-gradient-to-r ${barColor} rounded-full relative`}
-          >
-            {/* Shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full" />
-          </motion.div>
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className={`h-full ${barColor} rounded-full`}
+          />
         </div>
       </div>
 
@@ -104,8 +96,7 @@ export default function ResultCard({ result }) {
 
       {/* Disclaimer */}
       <p className="text-gray-500 text-xs border-t border-white/10 pt-3">
-        ⚠️ This AI analysis provides probabilistic results. Always consider domain context.
-        Model: EfficientNet + LSTM.
+        This analysis is probabilistic. Please verify results independently.
       </p>
     </motion.div>
   )

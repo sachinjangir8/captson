@@ -12,7 +12,6 @@ Endpoints:
 import os
 import time
 import tempfile
-import shutil
 from pathlib import Path
 from typing import Optional
 

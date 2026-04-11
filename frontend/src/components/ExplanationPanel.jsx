@@ -16,7 +16,7 @@ export default function ExplanationPanel({ explanations, prediction }) {
     ? 'bg-red-500/10 border-red-500/30' 
     : 'bg-emerald-500/10 border-emerald-500/30'
   
-  const iconColor = prediction === 'fake' ? '🔍' : '✅'
+
 
   return (
     <motion.div
@@ -27,7 +27,7 @@ export default function ExplanationPanel({ explanations, prediction }) {
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <span className="text-3xl">{iconColor}</span>
+
         <div>
           <h3 className="text-xl font-bold text-white">Why this prediction?</h3>
           <p className="text-gray-400 text-sm">
@@ -58,12 +58,9 @@ export default function ExplanationPanel({ explanations, prediction }) {
 
       {/* Info Note */}
       <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-        <p className="text-blue-300 text-sm flex items-center gap-2">
-          <span>💡</span>
-          <span>
-            These explanations are generated based on patterns the model learned during training. 
-            Always consider domain context when interpreting results.
-          </span>
+        <p className="text-blue-300 text-sm">
+          These explanations are generated based on patterns the model learned during training. 
+          Always consider domain context when interpreting results.
         </p>
       </div>
     </motion.div>
