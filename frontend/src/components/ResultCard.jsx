@@ -13,14 +13,14 @@ export default function ResultCard({ result }) {
 
   const barColor    = isFake ? 'bg-red-500' : 'bg-green-500'
 
-  const borderColor = isFake ? 'border-red-500/30' : 'border-emerald-500/30'
-  const bgColor     = isFake ? 'bg-red-500/10' : 'bg-emerald-500/10'
-  const textColor   = isFake ? 'text-red-400' : 'text-emerald-400'
+  const borderColor = isFake ? 'border-red-200' : 'border-emerald-200'
+  const bgColor     = isFake ? 'bg-red-50' : 'bg-emerald-50'
+  const textColor   = isFake ? 'text-red-700' : 'text-emerald-800'
 
   const RiskLevel = () => {
-    if (confidence >= 85) return <span className="text-xs text-red-400 font-medium">HIGH RISK</span>
-    if (confidence >= 60) return <span className="text-xs text-yellow-400 font-medium">MEDIUM RISK</span>
-    return <span className="text-xs text-green-400 font-medium">LOW RISK</span>
+    if (confidence >= 85) return <span className="text-xs text-red-700 font-bold bg-red-100 px-2 py-0.5 rounded">HIGH RISK</span>
+    if (confidence >= 60) return <span className="text-xs text-amber-600 font-bold bg-amber-100 px-2 py-0.5 rounded">MEDIUM RISK</span>
+    return <span className="text-xs text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded">LOW RISK</span>
   }
 
   return (
@@ -33,15 +33,15 @@ export default function ResultCard({ result }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-400 text-xs uppercase tracking-widest mb-1">
+          <p className="text-slate-500 text-xs uppercase tracking-widest mb-1 font-semibold">
             Analysis Result
           </p>
           <h3 className={`text-2xl font-bold ${textColor}`}>{label}</h3>
         </div>
 
         <div
-          className={`px-3 py-1 rounded-md text-sm font-semibold border ${
-            isFake ? 'text-red-400 border-red-500/30 bg-red-500/10' : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+          className={`px-3 py-1 rounded-md text-sm font-bold border ${
+            isFake ? 'text-red-700 border-red-200 bg-red-100' : 'text-emerald-700 border-emerald-200 bg-emerald-100'
           }`}
         >
           {isFake ? 'FAKE' : 'REAL'}
@@ -51,14 +51,14 @@ export default function ResultCard({ result }) {
       {/* Confidence Bar */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-400 text-sm">Confidence</span>
+          <span className="text-slate-500 text-sm font-medium">Confidence</span>
           <div className="flex items-center gap-2">
             {isFake && <RiskLevel />}
             <span className={`font-bold text-lg ${textColor}`}>{confidence}%</span>
           </div>
         </div>
 
-        <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden shadow-inner border border-slate-200">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${confidence}%` }}
@@ -70,32 +70,32 @@ export default function ResultCard({ result }) {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white/5 rounded-xl p-3">
-          <p className="text-gray-500 text-xs mb-1">Verdict</p>
+        <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
+          <p className="text-slate-500 text-xs mb-1 font-medium">Verdict</p>
           <p className={`font-semibold ${textColor}`}>
             {isFake ? 'Likely Manipulated' : 'Likely Authentic'}
           </p>
         </div>
-        <div className="bg-white/5 rounded-xl p-3">
-          <p className="text-gray-500 text-xs mb-1">Confidence Score</p>
-          <p className="text-white font-semibold">{result.confidence?.toFixed(4)}</p>
+        <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
+          <p className="text-slate-500 text-xs mb-1 font-medium">Confidence Score</p>
+          <p className="text-slate-800 font-semibold">{result.confidence?.toFixed(4)}</p>
         </div>
       </div>
 
       {/* Heatmap (optional) */}
       {result.heatmap_url && (
         <div>
-          <p className="text-gray-400 text-sm mb-2 font-medium">Grad-CAM Heatmap</p>
+          <p className="text-slate-500 text-sm mb-2 font-medium">Grad-CAM Heatmap</p>
           <img
             src={result.heatmap_url}
             alt="Grad-CAM heatmap"
-            className="w-full rounded-xl border border-white/10 object-cover"
+            className="w-full rounded-xl border border-slate-200 object-cover shadow-sm"
           />
         </div>
       )}
 
       {/* Disclaimer */}
-      <p className="text-gray-500 text-xs border-t border-white/10 pt-3">
+      <p className="text-slate-400 text-xs border-t border-slate-200 pt-3">
         This analysis is probabilistic. Please verify results independently.
       </p>
     </motion.div>

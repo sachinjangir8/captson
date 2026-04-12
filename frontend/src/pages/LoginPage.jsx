@@ -26,10 +26,10 @@ const EyeIcon = ({ open }) => open ? (
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function LoginPage() {
-  const { login }               = useAuth()
+  const { login } = useAuth()
   const { formError, isSubmitting, clearError, handleAuthAction } = useAuthForm()
-  const navigate                = useNavigate()
-  const [email, setEmail]       = useState('')
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
 
@@ -42,10 +42,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background glow orbs */}
-      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary-600/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 -right-20 w-72 h-72 bg-purple-600/15 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-indigo-200/50 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 -right-20 w-72 h-72 bg-purple-200/50 rounded-full blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -54,15 +54,15 @@ export default function LoginPage() {
         className="w-full max-w-md relative"
       >
         {/* Card */}
-        <div className="bg-dark-800/70 backdrop-blur-xl rounded-3xl border border-white/10 p-8 shadow-2xl">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white p-8 shadow-2xl">
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl
-                            bg-primary-600/20 border border-primary-500/30 mb-4 text-primary-400">
+                            bg-indigo-50 border border-indigo-100 mb-4 text-indigo-500">
               <ShieldIcon />
             </div>
-            <h1 className="text-3xl font-bold text-white">Welcome back</h1>
-            <p className="text-gray-400 mt-1 text-sm">Sign in to DeepGuard AI</p>
+            <h1 className="text-3xl font-bold text-slate-800">Welcome back</h1>
+            <p className="text-slate-500 mt-1 text-sm">Sign in to DeepGuard AI</p>
           </div>
 
           {/* Error */}
@@ -75,7 +75,7 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-300 mb-1.5 font-medium">Email</label>
+              <label className="block text-sm text-slate-600 mb-1.5 font-medium">Email</label>
               <input
                 type="email"
                 id="login-email"
@@ -89,7 +89,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-300 mb-1.5 font-medium">Password</label>
+              <label className="block text-sm text-slate-600 mb-1.5 font-medium">Password</label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
@@ -104,8 +104,8 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPass((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400
-                             hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400
+                             hover:text-slate-600 transition-colors"
                   aria-label="Toggle password visibility"
                 >
                   <EyeIcon open={showPass} />
@@ -132,24 +132,24 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-gray-500 text-xs">NEW HERE?</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-slate-400 font-semibold text-xs border border-slate-200 bg-slate-50 px-2 py-1 rounded-full">NEW HERE?</span>
+            <div className="flex-1 h-px bg-slate-200" />
           </div>
 
           {/* Signup link */}
           <Link
             to="/signup"
-            className="block text-center py-3 px-6 rounded-xl border border-white/15
-                       text-gray-300 hover:text-white hover:border-white/30 hover:bg-white/5
-                       transition-all duration-200 font-medium text-sm"
+            className="block text-center py-3 px-6 rounded-xl border border-slate-200
+                       text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:bg-slate-50
+                       transition-all duration-200 font-medium text-sm shadow-sm"
           >
             Create your free account
           </Link>
         </div>
 
         {/* Bottom tagline */}
-        <p className="text-center text-gray-600 text-xs mt-5">
+        <p className="text-center text-slate-500 text-xs mt-5">
           🔒 Secured with Firebase Authentication
         </p>
       </motion.div>

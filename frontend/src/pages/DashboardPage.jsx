@@ -13,8 +13,8 @@ import { useVideoAnalysis } from '../hooks/useVideoAnalysis'
 function StatCard({ label, value }) {
   return (
     <div className="glass-card text-center p-4">
-      <div className="text-xl font-bold text-white">{value}</div>
-      <div className="text-gray-400 text-xs mt-1">{label}</div>
+      <div className="text-xl font-bold text-slate-800">{value}</div>
+      <div className="text-slate-500 text-xs mt-1 font-medium">{label}</div>
     </div>
   )
 }
@@ -30,7 +30,7 @@ export default function DashboardPage() {
   const fileInputRef = useRef()
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -42,16 +42,16 @@ export default function DashboardPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20
-                          text-blue-400 text-xs font-medium px-3 py-1.5 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100
+                          text-indigo-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-4 shadow-sm">
             AI-Powered Detection
           </div>
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-white mb-4 leading-tight">
+          <h1 className="text-5xl sm:text-6xl font-extrabold text-slate-900 mb-4 leading-tight">
             <span className="gradient-text">Deepfake</span> Detector
           </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-lg max-w-xl mx-auto leading-relaxed">
             Upload any video and our AI model will analyze it for signs of manipulation
-            using <strong className="text-gray-300">EfficientNet + LSTM</strong> architecture.
+            using <strong className="text-slate-800 font-semibold">EfficientNet + LSTM</strong> architecture.
           </p>
         </motion.div>
 
@@ -77,7 +77,7 @@ export default function DashboardPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="glass-card p-6 space-y-5"
           >
-            <h2 className="text-xl font-medium text-white">
+            <h2 className="text-xl font-semibold text-slate-800">
               Upload Video
             </h2>
 
@@ -104,13 +104,13 @@ export default function DashboardPage() {
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                 >
-                  <p className="text-gray-400 text-sm mb-2 font-medium">Preview</p>
+                  <p className="text-slate-500 text-sm mb-2 font-medium">Preview</p>
                   {/* CRITICAL FIX: Use key={videoURL} to force refresh when URL changes */}
                   <video
                     key={videoURL}
                     controls
                     preload="auto"
-                    className="w-full rounded-xl border border-white/10 max-h-48 object-cover"
+                    className="w-full rounded-xl border border-slate-200 max-h-48 object-cover shadow-sm"
                   >
                     <source src={videoURL} type={videoFile?.type || 'video/mp4'} />
                     Your browser does not support the video tag.
@@ -129,24 +129,24 @@ export default function DashboardPage() {
                   className="space-y-2"
                 >
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">
+                    <span className="text-slate-500 font-medium">
                       {uploadProgress < 100 ? 'Uploading...' : 'Analyzing with AI...'}
                     </span>
                     {uploadProgress < 100 && (
-                      <span className="text-blue-400 font-medium">{uploadProgress}%</span>
+                      <span className="text-indigo-600 font-bold">{uploadProgress}%</span>
                     )}
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-slate-100 border border-slate-200 rounded-full overflow-hidden shadow-inner">
                     {uploadProgress < 100 ? (
                       <motion.div
-                        className="h-full bg-blue-500 rounded-full"
+                        className="h-full bg-indigo-500 rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${uploadProgress}%` }}
                         transition={{ ease: 'linear' }}
                       />
                     ) : (
                       /* Indeterminate bar while AI processes */
-                      <div className="h-full bg-blue-500 rounded-full animate-pulse w-full" />
+                      <div className="h-full bg-indigo-500 rounded-full animate-pulse w-full" />
                     )}
                   </div>
                 </motion.div>
@@ -183,7 +183,7 @@ export default function DashboardPage() {
           >
             {/* Main Result Card */}
             <div className="glass-card p-6">
-              <h2 className="text-xl font-medium text-white mb-5">
+              <h2 className="text-xl font-semibold text-slate-800 mb-5">
                 Analysis Result
               </h2>
 
@@ -196,15 +196,15 @@ export default function DashboardPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center h-64 text-center"
+                    className="flex flex-col items-center justify-center h-64 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200"
                   >
-                    <div className="text-gray-600 mb-4">
-                      <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="text-slate-400 mb-4">
+                      <svg className="w-12 h-12 mx-auto drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
-                    <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-                      Upload a video and click <strong className="text-gray-400">Analyze Video</strong>.
+                    <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
+                      Upload a video and click <strong className="text-slate-700">Analyze Video</strong>.
                       Results will appear here with confidence scores.
                     </p>
                   </motion.div>
@@ -248,7 +248,7 @@ export default function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-16"
         >
-          <h2 className="text-2xl font-bold text-white text-center mb-8">How It Works</h2>
+          <h2 className="text-2xl font-bold text-slate-800 text-center mb-8">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               { step: '01', title: 'Upload',   desc: 'Drop or select a video file up to 500 MB in MP4, AVI, MOV, WebM, or MKV format.' },
@@ -256,12 +256,12 @@ export default function DashboardPage() {
               { step: '03', title: 'Results',  desc: 'Receive a confidence score and detailed verdict on whether the video is real or manipulated.' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="glass-card p-6 relative overflow-hidden group">
-                <div className="absolute top-4 right-4 text-3xl font-black text-white/5
-                                group-hover:text-white/10 transition-colors">
+                <div className="absolute top-4 right-4 text-4xl font-black text-slate-100
+                                group-hover:text-indigo-50 transition-colors">
                   {step}
                 </div>
-                <h3 className="text-white font-medium text-lg mb-2 mt-4">{title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+                <h3 className="text-slate-800 font-semibold text-lg mb-2 mt-4 relative z-10">{title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed relative z-10">{desc}</p>
               </div>
             ))}
           </div>

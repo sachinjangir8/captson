@@ -52,16 +52,16 @@ export default function Navbar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="sticky top-0 z-50 bg-dark-800/80 backdrop-blur-md border-b border-white/10"
+      className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <div className="text-primary-400">
+            <div className="text-indigo-600">
               <ShieldIcon />
             </div>
-            <span className="text-white font-bold text-xl tracking-tight">
+            <span className="text-slate-800 font-bold text-xl tracking-tight">
               Deep<span className="gradient-text">Guard</span> AI
             </span>
           </div>
@@ -71,7 +71,7 @@ export default function Navbar() {
             {/* Dark mode toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100
                          transition-all duration-200"
               aria-label="Toggle dark mode"
             >
@@ -82,13 +82,13 @@ export default function Navbar() {
             {user && (
               <>
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg
-                                bg-white/5 border border-white/10">
+                                bg-slate-50 border border-slate-200">
                   {/* Avatar circle */}
-                  <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center
-                                  justify-center text-white text-xs font-bold shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center
+                                  justify-center text-indigo-700 text-xs font-bold shrink-0">
                     {user.email?.[0]?.toUpperCase() ?? 'U'}
                   </div>
-                  <span className="text-gray-300 text-sm max-w-[160px] truncate">
+                  <span className="text-slate-700 text-sm max-w-[160px] truncate font-medium">
                     {user.displayName || user.email}
                   </span>
                 </div>
@@ -96,8 +96,8 @@ export default function Navbar() {
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg
-                             text-gray-400 hover:text-white hover:bg-red-500/20
-                             hover:border-red-500/40 border border-transparent
+                             text-slate-500 hover:text-red-600 hover:bg-red-50
+                             hover:border-red-200 border border-transparent
                              transition-all duration-200 text-sm font-medium"
                 >
                   <LogoutIcon />

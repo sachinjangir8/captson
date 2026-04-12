@@ -28,17 +28,17 @@ function PasswordStrength({ password }) {
   const getStrength = () => {
     if (!password) return { score: 0, label: '', color: '' }
     let score = 0
-    if (password.length >= 8)    score++
-    if (/[A-Z]/.test(password))  score++
-    if (/[0-9]/.test(password))  score++
+    if (password.length >= 8) score++
+    if (/[A-Z]/.test(password)) score++
+    if (/[0-9]/.test(password)) score++
     if (/[^A-Za-z0-9]/.test(password)) score++
 
     const levels = [
-      { label: 'Too short', color: 'bg-gray-600' },
-      { label: 'Weak',      color: 'bg-red-500'  },
-      { label: 'Fair',      color: 'bg-yellow-500' },
-      { label: 'Good',      color: 'bg-blue-500' },
-      { label: 'Strong',    color: 'bg-emerald-500' },
+      { label: 'Too short', color: 'bg-slate-300' },
+      { label: 'Weak', color: 'bg-red-400' },
+      { label: 'Fair', color: 'bg-yellow-400' },
+      { label: 'Good', color: 'bg-blue-400' },
+      { label: 'Strong', color: 'bg-emerald-400' },
     ]
     return { score, ...levels[score] }
   }
@@ -51,10 +51,10 @@ function PasswordStrength({ password }) {
       <div className="flex gap-1 mb-1">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300
-            ${i <= score ? color : 'bg-white/10'}`} />
+            ${i <= score ? color : 'bg-slate-200'}`} />
         ))}
       </div>
-      <p className={`text-xs ${score >= 3 ? 'text-emerald-400' : score >= 2 ? 'text-yellow-400' : 'text-red-400'}`}>
+      <p className={`text-xs ${score >= 3 ? 'text-emerald-500' : score >= 2 ? 'text-yellow-500' : 'text-slate-500'}`}>
         {label}
       </p>
     </div>
@@ -63,13 +63,13 @@ function PasswordStrength({ password }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function SignupPage() {
-  const { signup }              = useAuth()
+  const { signup } = useAuth()
   const { formError, isSubmitting, clearError, handleAuthAction } = useAuthForm()
-  const navigate                = useNavigate()
-  const [name, setName]         = useState('')
-  const [email, setEmail]       = useState('')
+  const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirm, setConfirm]   = useState('')
+  const [confirm, setConfirm] = useState('')
   const [showPass, setShowPass] = useState(false)
 
   const handleSubmit = (e) => {
@@ -88,10 +88,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background orbs */}
-      <div className="absolute top-1/3 -right-24 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 -left-24 w-80 h-80 bg-primary-600/20 rounded-full blur-3xl" />
+      <div className="absolute top-1/3 -right-24 w-80 h-80 bg-purple-200/50 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/3 -left-24 w-80 h-80 bg-indigo-200/50 rounded-full blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -99,15 +99,15 @@ export default function SignupPage() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-md relative"
       >
-        <div className="bg-dark-800/70 backdrop-blur-xl rounded-3xl border border-white/10 p-8 shadow-2xl">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white p-8 shadow-2xl">
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl
-                            bg-primary-600/20 border border-primary-500/30 mb-4 text-primary-400">
+                            bg-indigo-50 border border-indigo-100 mb-4 text-indigo-500">
               <ShieldIcon />
             </div>
-            <h1 className="text-3xl font-bold text-white">Create Account</h1>
-            <p className="text-gray-400 mt-1 text-sm">Join DeepGuard AI today — it's free</p>
+            <h1 className="text-3xl font-bold text-slate-800">Create Account</h1>
+            <p className="text-slate-500 mt-1 text-sm">Join DeepGuard AI today — it's free</p>
           </div>
 
           {formError && (
@@ -119,7 +119,7 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1.5 font-medium">Display Name</label>
+              <label className="block text-sm text-slate-600 mb-1.5 font-medium">Display Name</label>
               <input
                 type="text"
                 id="signup-name"
@@ -133,7 +133,7 @@ export default function SignupPage() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1.5 font-medium">Email</label>
+              <label className="block text-sm text-slate-600 mb-1.5 font-medium">Email</label>
               <input
                 type="email"
                 id="signup-email"
@@ -148,7 +148,7 @@ export default function SignupPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1.5 font-medium">Password</label>
+              <label className="block text-sm text-slate-600 mb-1.5 font-medium">Password</label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
@@ -164,7 +164,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setShowPass((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   <EyeIcon open={showPass} />
                 </button>
@@ -174,7 +174,7 @@ export default function SignupPage() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1.5 font-medium">Confirm Password</label>
+              <label className="block text-sm text-slate-600 mb-1.5 font-medium">Confirm Password</label>
               <input
                 type={showPass ? 'text' : 'password'}
                 id="signup-confirm"
@@ -184,14 +184,14 @@ export default function SignupPage() {
                 required
                 autoComplete="new-password"
                 className={`input-field ${confirm && confirm !== password
-                  ? 'border-red-500/60 focus:border-red-500'
+                  ? 'border-red-400 focus:border-red-500'
                   : confirm && confirm === password
-                    ? 'border-emerald-500/60 focus:border-emerald-500'
+                    ? 'border-emerald-400 focus:border-emerald-500'
                     : ''
-                }`}
+                  }`}
               />
               {confirm && confirm !== password && (
-                <p className="text-red-400 text-xs mt-1">Passwords do not match</p>
+                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
               )}
             </div>
 
@@ -213,22 +213,22 @@ export default function SignupPage() {
           </form>
 
           <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-gray-500 text-xs">ALREADY HAVE ONE?</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-slate-400 font-semibold text-xs border border-slate-200 bg-slate-50 px-2 py-1 rounded-full">ALREADY HAVE ONE?</span>
+            <div className="flex-1 h-px bg-slate-200" />
           </div>
 
           <Link
             to="/login"
-            className="block text-center py-3 px-6 rounded-xl border border-white/15
-                       text-gray-300 hover:text-white hover:border-white/30 hover:bg-white/5
-                       transition-all duration-200 font-medium text-sm"
+            className="block text-center py-3 px-6 rounded-xl border border-slate-200
+                       text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:bg-slate-50
+                       transition-all duration-200 font-medium text-sm shadow-sm"
           >
             Sign in instead
           </Link>
         </div>
 
-        <p className="text-center text-gray-600 text-xs mt-5">
+        <p className="text-center text-slate-500 text-xs mt-5">
           🔒 Secured with Firebase Authentication
         </p>
       </motion.div>
