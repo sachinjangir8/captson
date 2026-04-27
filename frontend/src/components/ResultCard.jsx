@@ -1,47 +1,32 @@
 import { motion } from 'framer-motion'
 
-/**
- * Displays the deepfake prediction result with animated confidence bar.
- *
- * Props:
- *  result: { prediction: 'real' | 'fake', confidence: number (0–1), heatmap_url?: string }
- */
 export default function ResultCard({ result }) {
   const isFake      = result.prediction?.toLowerCase() === 'fake'
   const confidence  = Math.round((result.confidence ?? 0) * 100)
-  const label       = isFake ? 'DEEPFAKE DETECTED' : 'AUTHENTIC VIDEO'
+  const label       = isFake ? 'Deepfake Detected' : 'Authentic Video'
 
-  const barColor    = isFake ? 'bg-red-500' : 'bg-green-500'
-
-  const borderColor = isFake ? 'border-red-200' : 'border-emerald-200'
-  const bgColor     = isFake ? 'bg-red-50' : 'bg-emerald-50'
-  const textColor   = isFake ? 'text-red-700' : 'text-emerald-800'
+  const barColor    = isFake ? 'bg-red-600' : 'bg-emerald-600'
+  const textColor   = isFake ? 'text-red-700 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'
 
   const RiskLevel = () => {
-    if (confidence >= 85) return <span className="text-xs text-red-700 font-bold bg-red-100 px-2 py-0.5 rounded">HIGH RISK</span>
-    if (confidence >= 60) return <span className="text-xs text-amber-600 font-bold bg-amber-100 px-2 py-0.5 rounded">MEDIUM RISK</span>
-    return <span className="text-xs text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded">LOW RISK</span>
+    if (confidence >= 85) return <span className="text-xs text-red-700 dark:text-red-400 font-medium bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 px-2.5 py-0.5 rounded-full">High Risk</span>
+    if (confidence >= 60) return <span className="text-xs text-amber-700 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-2.5 py-0.5 rounded-full">Medium Risk</span>
+    return <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-2.5 py-0.5 rounded-full">Low Risk</span>
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, type: 'spring', stiffness: 100 }}
-      className={`rounded-2xl border ${borderColor} ${bgColor} p-6 space-y-5`}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-slate-500 text-xs uppercase tracking-widest mb-1 font-semibold">
-            Analysis Result
+          <h3 className={`text-2xl font-semibold tracking-tight ${textColor}`}>{label}</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+            {isFake ? 'Our analysis detected significant signs of algorithmic manipulation.' : 'No significant signs of manipulation were detected in this video.'}
           </p>
-          <h3 className={`text-2xl font-bold ${textColor}`}>{label}</h3>
         </div>
 
-        <div
-          className={`px-3 py-1 rounded-md text-sm font-bold border ${
-            isFake ? 'text-red-700 border-red-200 bg-red-100' : 'text-emerald-700 border-emerald-200 bg-emerald-100'
+        <div className={`px-4 py-1.5 rounded-full text-sm font-medium border ${
+            isFake ? 'text-red-700 border-red-200 bg-red-50 dark:text-red-400 dark:bg-red-500/10 dark:border-red-500/20' : 'text-emerald-700 border-emerald-200 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/20'
           }`}
         >
           {isFake ? 'FAKE' : 'REAL'}
@@ -50,54 +35,42 @@ export default function ResultCard({ result }) {
 
       {/* Confidence Bar */}
       <div>
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-slate-500 text-sm font-medium">Confidence</span>
-          <div className="flex items-center gap-2">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-gray-900 dark:text-white font-medium text-sm">Confidence Score</span>
+          <div className="flex items-center gap-3">
             {isFake && <RiskLevel />}
-            <span className={`font-bold text-lg ${textColor}`}>{confidence}%</span>
+            <span className={`font-semibold ${textColor}`}>{confidence}%</span>
           </div>
         </div>
 
-        <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden shadow-inner border border-slate-200">
+        <div className="w-full h-2 bg-gray-100 dark:bg-[#262626] rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${confidence}%` }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className={`h-full ${barColor} rounded-full`}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className={`h-full ${barColor}`}
           />
         </div>
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-          <p className="text-slate-500 text-xs mb-1 font-medium">Verdict</p>
-          <p className={`font-semibold ${textColor}`}>
+      <div className="grid grid-cols-2 gap-4 pt-2">
+        <div className="p-4 rounded-lg bg-[#FAFAFA] dark:bg-[#111111] border border-gray-100 dark:border-[#262626]">
+          <p className="text-gray-500 dark:text-gray-400 text-xs mb-1 font-medium tracking-wide">VERDICT</p>
+          <p className="text-gray-900 dark:text-white text-sm font-medium">
             {isFake ? 'Likely Manipulated' : 'Likely Authentic'}
           </p>
         </div>
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-          <p className="text-slate-500 text-xs mb-1 font-medium">Confidence Score</p>
-          <p className="text-slate-800 font-semibold">{result.confidence?.toFixed(4)}</p>
+        <div className="p-4 rounded-lg bg-[#FAFAFA] dark:bg-[#111111] border border-gray-100 dark:border-[#262626]">
+          <p className="text-gray-500 dark:text-gray-400 text-xs mb-1 font-medium tracking-wide">RAW SCORE</p>
+          <p className="text-gray-900 dark:text-white text-sm font-medium">{result.confidence?.toFixed(4)}</p>
         </div>
       </div>
 
-      {/* Heatmap (optional) */}
-      {result.heatmap_url && (
-        <div>
-          <p className="text-slate-500 text-sm mb-2 font-medium">Grad-CAM Heatmap</p>
-          <img
-            src={result.heatmap_url}
-            alt="Grad-CAM heatmap"
-            className="w-full rounded-xl border border-slate-200 object-cover shadow-sm"
-          />
-        </div>
-      )}
-
       {/* Disclaimer */}
-      <p className="text-slate-400 text-xs border-t border-slate-200 pt-3">
+      <p className="text-gray-400 dark:text-gray-500 text-xs text-center sm:text-left pt-2">
         This analysis is probabilistic. Please verify results independently.
       </p>
-    </motion.div>
+    </div>
   )
 }

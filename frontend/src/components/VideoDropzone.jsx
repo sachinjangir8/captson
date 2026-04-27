@@ -3,14 +3,14 @@ import { useDropzone } from 'react-dropzone'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const UploadIcon = () => (
-  <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round"
       d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
   </svg>
 )
 
 const VideoIcon = () => (
-  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round"
       d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
   </svg>
@@ -29,7 +29,6 @@ function formatBytes(bytes) {
   return `${(bytes / 1024 ** 3).toFixed(2)} GB`
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function VideoDropzone({ videoFile, onFileSelect, onReset, disabled }) {
   const [isDragging, setIsDragging] = useState(false)
   
@@ -58,7 +57,6 @@ export default function VideoDropzone({ videoFile, onFileSelect, onReset, disabl
     <div>
       <AnimatePresence mode="wait">
         {!videoFile ? (
-          // ── Drop Zone ──────────────────────────────────────────────────────
           <motion.div
             key="dropzone"
             initial={{ opacity: 0, scale: 0.97 }}
@@ -66,65 +64,64 @@ export default function VideoDropzone({ videoFile, onFileSelect, onReset, disabl
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.2 }}
             {...getRootProps()}
-            className={`cursor-pointer border-2 border-dashed rounded-2xl p-10 text-center
-                        transition-all duration-200
+            className={`cursor-pointer border-2 border-dashed rounded-xl py-12 px-6 text-center
+                        transition-colors duration-200
                         ${isDragActive
-                          ? 'border-primary-400 bg-primary-500/10 scale-[1.02]'
-                          : 'border-white/20 hover:border-primary-500/60 hover:bg-white/5'
+                          ? 'border-[#0F172A] bg-[#0F172A]/5 dark:border-white dark:bg-white/5'
+                          : 'border-gray-200 bg-[#FAFAFA] hover:border-gray-300 hover:bg-gray-50 dark:border-[#262626] dark:bg-[#111111] dark:hover:border-white/20 dark:hover:bg-[#1A1A1A]'
                         }
                         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <input {...getInputProps()} />
             <motion.div
-              animate={isDragActive ? { scale: 1.15 } : { scale: 1 }}
-              className="flex justify-center mb-4 text-gray-400"
+              animate={isDragActive ? { scale: 1.1 } : { scale: 1 }}
+              className={`flex justify-center mb-4 ${isDragActive ? 'text-[#0F172A] dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}
             >
               <UploadIcon />
             </motion.div>
-            <p className="text-white font-semibold mb-1">
-              {isDragActive ? 'Drop your video here!' : 'Drag & drop your video'}
+            <p className="text-gray-900 dark:text-white font-medium text-base mb-1">
+              {isDragActive ? 'Drop file to upload' : 'Click to select or drop video'}
             </p>
-            <p className="text-gray-400 text-sm mb-4">
-              or click to browse files
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-5">
+              Securely analyze video authenticity
             </p>
             <div className="flex flex-wrap justify-center gap-2">
-              {['MP4', 'AVI', 'MOV', 'WebM', 'MKV'].map((ext) => (
+              {['MP4', 'MOV', 'AVI', 'WEBM'].map((ext) => (
                 <span key={ext}
-                  className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/10">
+                  className="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 bg-white dark:bg-[#1A1A1A] px-2 py-0.5 rounded border border-gray-200 dark:border-[#262626]">
                   {ext}
                 </span>
               ))}
             </div>
-            <p className="text-gray-500 text-xs mt-3">Max size: 500 MB</p>
+            <p className="text-gray-400 dark:text-gray-500 text-[11px] mt-4 font-medium tracking-wide">MAX SIZE: 500 MB</p>
           </motion.div>
         ) : (
-          // ── File Selected ──────────────────────────────────────────────────
           <motion.div
             key="file-info"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}
-            className="flex items-center justify-between p-4 rounded-2xl
-                       bg-white/5 border border-white/15"
+            className="flex items-center justify-between p-4 rounded-xl
+                       bg-[#FAFAFA] dark:bg-[#111111] border border-gray-200 dark:border-[#262626]"
           >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center
-                              justify-center text-primary-400 shrink-0">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-[#1A1A1A] border border-gray-200 dark:border-[#262626] flex items-center
+                              justify-center text-gray-500 dark:text-gray-400 shrink-0">
                 <VideoIcon />
               </div>
               <div className="min-w-0">
-                <p className="text-white font-medium truncate max-w-[220px]">
+                <p className="text-gray-900 dark:text-white font-medium truncate max-w-[220px] text-sm">
                   {videoFile.name}
                 </p>
-                <p className="text-gray-400 text-sm">{formatBytes(videoFile.size)}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{formatBytes(videoFile.size)}</p>
               </div>
             </div>
             <button
-              onClick={onReset}
+              onClick={(e) => { e.stopPropagation(); onReset(); }}
               disabled={disabled}
-              className="ml-3 p-2 rounded-lg text-gray-400 hover:text-red-400
-                         hover:bg-red-500/10 transition-all duration-200 shrink-0
+              className="ml-3 p-2 rounded-lg text-gray-400 hover:text-red-600
+                         hover:bg-red-50 hover:border-red-100 dark:hover:bg-red-500/10 dark:hover:border-red-500/30 border border-transparent transition-all duration-200 shrink-0
                          disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remove file"
             >

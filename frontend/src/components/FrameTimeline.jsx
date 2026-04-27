@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-/**
- * Displays a timeline graph showing fake probability across frames.
- * Allows clicking on frames to view details.
- * 
- * Props:
- *  frameScores: number[] - Array of fake probabilities per frame
- *  suspiciousFrames: number[] - Indices of suspicious frames
- */
 export default function FrameTimeline({ frameScores, suspiciousFrames }) {
   const [selectedFrame, setSelectedFrame] = useState(null)
   const [showHeatmap, setShowHeatmap] = useState(true)
@@ -21,12 +13,10 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
   const minScore = Math.min(...frameScores)
   const avgScore = frameScores.reduce((a, b) => a + b, 0) / frameScores.length
 
-  // Graph dimensions
   const width = 100
   const height = 40
   const threshold = 0.5
 
-  // Generate path for the line graph
   const points = frameScores.map((score, index) => {
     const x = (index / (frameScores.length - 1)) * width
     const y = height - (score * height)
@@ -34,36 +24,18 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
   }).join(' ')
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-bold text-white">Frame-by-Frame Analysis</h3>
-          <p className="text-gray-400 text-sm">
-            Fake probability across {frameScores.length} frames
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Frame-by-Frame Timeline</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Analysis of {frameScores.length} individual frames
           </p>
         </div>
-        
-        {/* Toggle Heatmap */}
-        <button
-          onClick={() => setShowHeatmap(!showHeatmap)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            showHeatmap
-              ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30'
-              : 'bg-white/5 text-gray-400 border border-white/10'
-          }`}
-        >
-          {showHeatmap ? 'Hide Heatmap' : 'Show Heatmap'}
-        </button>
       </div>
 
       {/* Timeline Graph */}
-      <div className="relative w-full h-48 bg-dark-900/50 rounded-xl border border-white/10 overflow-hidden">
+      <div className="relative w-full h-48 bg-[#FAFAFA] dark:bg-[#111111] rounded-xl border border-gray-200 dark:border-[#262626] overflow-hidden">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-full preserve-3d"
@@ -78,31 +50,31 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
             stroke="#ef4444"
             strokeWidth="0.5"
             strokeDasharray="2,2"
-            opacity="0.6"
+            opacity="0.4"
           />
 
           {/* Area under curve */}
           <polygon
             points={`0,${height} ${points} ${width},${height}`}
-            fill="url(#gradient)"
-            opacity="0.3"
+            fill="url(#timeline-gradient)"
+            opacity="0.15"
           />
 
           {/* Line graph */}
           <polyline
             points={points}
             fill="none"
-            stroke="#8b5cf6"
+            stroke="currentColor"
             strokeWidth="0.8"
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="text-[#0F172A] dark:text-gray-200"
           />
 
-          {/* Gradient definition */}
           <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+            <linearGradient id="timeline-gradient" x1="0%" y1="0%" x2="0%" y2="100%" className="text-[#0F172A] dark:text-gray-200">
+              <stop offset="0%" stopColor="currentColor" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
             </linearGradient>
           </defs>
 
@@ -117,44 +89,42 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
                 r="1.5"
                 fill="#ef4444"
                 stroke="#fff"
-                strokeWidth="0.3"
-                className="cursor-pointer hover:r-2 transition-all"
+                strokeWidth="0.4"
+                className="cursor-pointer hover:r-2 transition-all dark:stroke-[#111111]"
                 onClick={() => setSelectedFrame(frameIdx)}
               />
             )
           })}
         </svg>
 
-        {/* Y-axis labels */}
-        <div className="absolute left-2 top-2 text-xs text-gray-500">
-          {maxScore.toFixed(2)}
+        <div className="absolute left-3 top-2 text-xs font-medium text-gray-400 dark:text-gray-500">
+          MAX ({maxScore.toFixed(2)})
         </div>
-        <div className="absolute left-2 bottom-2 text-xs text-gray-500">
-          {minScore.toFixed(2)}
+        <div className="absolute left-3 bottom-2 text-xs font-medium text-gray-400 dark:text-gray-500">
+          MIN ({minScore.toFixed(2)})
         </div>
 
-        {/* X-axis label */}
-        <div className="absolute right-2 bottom-2 text-xs text-gray-500">
-          Frame {frameScores.length}
+        <div className="absolute right-3 bottom-2 text-xs font-medium text-gray-400 dark:text-gray-500">
+          FRAME {frameScores.length}
         </div>
       </div>
 
       {/* Statistics Row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-4">
         <StatBox
-          label="Avg Probability"
+          label="AVG PROBABILITY"
           value={(avgScore * 100).toFixed(1) + '%'}
-          color={avgScore > 0.7 ? 'text-red-400' : avgScore > 0.4 ? 'text-yellow-400' : 'text-green-400'}
+          color={avgScore > 0.7 ? 'text-red-600 dark:text-red-400' : avgScore > 0.4 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}
         />
         <StatBox
-          label="Max Spike"
+          label="MAX SPIKE"
           value={(maxScore * 100).toFixed(1) + '%'}
-          color="text-red-400"
+          color="text-red-600 dark:text-red-400"
         />
         <StatBox
-          label="Min Value"
+          label="MIN SCORE"
           value={(minScore * 100).toFixed(1) + '%'}
-          color="text-green-400"
+          color="text-emerald-600 dark:text-emerald-400"
         />
       </div>
 
@@ -167,37 +137,38 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-primary-500/10 border border-primary-500/30 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold text-white">
+            <div className="mt-2 bg-gray-50 dark:bg-[#1A1A1A] border border-gray-200 dark:border-[#262626] rounded-xl p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
                   Frame {selectedFrame + 1} Details
                 </h4>
                 <button
                   onClick={() => setSelectedFrame(null)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
-                  ✕
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
               </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Fake Probability:</span>
+              <div className="space-y-2.5 text-sm">
+                <div className="flex justify-between items-center bg-white dark:bg-[#111111] border border-gray-100 dark:border-[#262626] p-2.5 rounded-lg shadow-sm">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium text-xs tracking-wide">SCORE</span>
                   <span className={`font-semibold ${
-                    frameScores[selectedFrame] > 0.7 ? 'text-red-400' : 'text-green-400'
+                    frameScores[selectedFrame] > 0.7 ? 'text-red-700 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'
                   }`}>
                     {(frameScores[selectedFrame] * 100).toFixed(1)}%
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Classification:</span>
-                  <span className="font-semibold text-white">
+                <div className="flex justify-between items-center bg-white dark:bg-[#111111] border border-gray-100 dark:border-[#262626] p-2.5 rounded-lg shadow-sm">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium text-xs tracking-wide">CLASSIFICATION</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
                     {frameScores[selectedFrame] > 0.5 ? 'FAKE' : 'REAL'}
                   </span>
                 </div>
                 {suspiciousFrames?.includes(selectedFrame) && (
-                  <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg">
-                    <p className="text-red-300 text-xs">
-                      This frame was flagged as suspicious
+                  <div className="mt-3 p-2.5 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg flex items-center gap-2">
+                    <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p className="text-red-700 dark:text-red-400 font-medium text-xs">
+                      Flagged as heavily manipulated.
                     </p>
                   </div>
                 )}
@@ -208,30 +179,29 @@ export default function FrameTimeline({ frameScores, suspiciousFrames }) {
       </AnimatePresence>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 text-xs text-gray-400 pt-2 border-t border-white/10">
+      <div className="flex items-center justify-center gap-6 text-xs text-gray-500 dark:text-gray-400 pt-5 border-t border-gray-100 dark:border-[#262626] font-medium tracking-wide">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-          <span>Fake Probability</span>
+          <div className="w-2 h-2 rounded-full bg-[#0F172A] dark:bg-gray-200"></div>
+          <span>SCORE</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <span>Suspicious Frame</span>
+          <div className="w-2 h-2 rounded-full bg-red-500"></div>
+          <span>SUSPICIOUS</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-px bg-red-500 border-dashed"></div>
-          <span>Threshold (50%)</span>
+          <div className="w-8 h-[1.5px] bg-red-400 opacity-60 flex gap-0.5"><div className="w-full bg-white dark:bg-[#111111]"></div><div className="w-full bg-white dark:bg-[#111111]"></div></div>
+          <span>THRESHOLD</span>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
-// Helper Component for Stat Boxes
 function StatBox({ label, value, color }) {
   return (
-    <div className="bg-white/5 rounded-xl p-3 text-center">
-      <p className="text-gray-500 text-xs mb-1">{label}</p>
-      <p className={`text-lg font-bold ${color}`}>{value}</p>
+    <div className="bg-[#FAFAFA] dark:bg-[#111111] border border-gray-100 dark:border-[#262626] rounded-lg p-3 text-center transition-colors hover:bg-gray-50 dark:hover:bg-[#1A1A1A]">
+      <p className="text-gray-400 dark:text-gray-500 text-[10px] font-medium tracking-wider mb-1 uppercase">{label}</p>
+      <p className={`text-base font-bold ${color}`}>{value}</p>
     </div>
   )
 }
