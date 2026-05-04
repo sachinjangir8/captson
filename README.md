@@ -1,5 +1,5 @@
 # DeepFake Detection System
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 A **production-ready, full-stack deepfake detection system** built using **React, FastAPI, PyTorch, and OpenCV**.
 Detects whether a video or image is **real or AI-generated** with confidence scores and frame-level analysis.
 
