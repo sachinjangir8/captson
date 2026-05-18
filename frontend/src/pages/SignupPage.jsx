@@ -1,62 +1,39 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useAuthForm } from '../hooks/useAuthForm'
-import Alert from '../components/Alert'
 
-const ShieldIcon = () => (
-  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-    <path strokeLinecap="round" strokeLinejoin="round"
-      d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-  </svg>
-)
-
-const EyeIcon = ({ open }) => open ? (
-  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-) : (
-  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-  </svg>
-)
-
-// ── Password Strength Indicator ───────────────────────────────────────────────
+// ── Password Strength ─────────────────────────────────────────────────────────
 function PasswordStrength({ password }) {
-  const getStrength = () => {
-    if (!password) return { score: 0, label: '', color: '' }
-    let score = 0
-    if (password.length >= 8) score++
-    if (/[A-Z]/.test(password)) score++
-    if (/[0-9]/.test(password)) score++
-    if (/[^A-Za-z0-9]/.test(password)) score++
-
-    const levels = [
-      { label: 'Too short', color: 'bg-slate-300 dark:bg-gray-600' },
-      { label: 'Weak', color: 'bg-red-400' },
-      { label: 'Fair', color: 'bg-yellow-400' },
-      { label: 'Good', color: 'bg-blue-400' },
-      { label: 'Strong', color: 'bg-emerald-400' },
-    ]
-    return { score, ...levels[score] }
-  }
-
-  const { score, label, color } = getStrength()
   if (!password) return null
 
+  let score = 0
+  if (password.length >= 8) score++
+  if (/[A-Z]/.test(password)) score++
+  if (/[0-9]/.test(password)) score++
+  if (/[^A-Za-z0-9]/.test(password)) score++
+
+  const levels = ['', 'Weak', 'Fair', 'Good', 'Strong']
+  const colors = ['', '#E24B4A', '#EF9F27', '#378ADD', '#1D9E75']
+
   return (
-    <div className="mt-1.5">
-      <div className="flex gap-1 mb-1">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300
-            ${i <= score ? color : 'bg-slate-200 dark:bg-[#262626]'}`} />
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 5 }}>
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} style={{
+            flex: 1,
+            height: 3,
+            borderRadius: 99,
+            background: i <= score ? colors[score] : '#EBEBEB',
+            transition: 'background 0.3s',
+          }} />
         ))}
       </div>
-      <p className={`text-xs ${score >= 3 ? 'text-emerald-500' : score >= 2 ? 'text-yellow-500' : 'text-slate-500 dark:text-gray-400'}`}>
-        {label}
-      </p>
+      {score > 0 && (
+        <p style={{ fontSize: 11, color: colors[score], fontWeight: 500 }}>
+          {levels[score]}
+        </p>
+      )}
     </div>
   )
 }
@@ -72,10 +49,12 @@ export default function SignupPage() {
   const [confirm, setConfirm] = useState('')
   const [showPass, setShowPass] = useState(false)
 
+  const passwordMismatch = confirm.length > 0 && confirm !== password
+  const passwordMatch = confirm.length > 0 && confirm === password
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (password !== confirm) {
-      // We re-use the hook's setFormError via a thrown error pattern
       handleAuthAction(async () => {
         throw Object.assign(new Error(), { code: 'passwords-mismatch' })
       })
@@ -87,151 +66,457 @@ export default function SignupPage() {
     })
   }
 
+  const focusTeal = e => e.target.style.borderColor = '#1D9E75'
+  const blurGray  = e => e.target.style.borderColor = '#EBEBEB'
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] flex items-center justify-center p-4 relative overflow-hidden transition-colors">
-      {/* Background orbs */}
-      <div className="absolute top-1/3 -right-24 w-80 h-80 bg-purple-200/50 dark:bg-purple-900/30 rounded-full blur-3xl transition-colors" />
-      <div className="absolute bottom-1/3 -left-24 w-80 h-80 bg-indigo-200/50 dark:bg-indigo-900/30 rounded-full blur-3xl transition-colors" />
+    <div style={styles.root}>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md relative"
-      >
-        <div className="bg-white/80 dark:bg-[#111111]/80 backdrop-blur-xl rounded-3xl border border-white dark:border-white/5 p-8 shadow-2xl transition-colors">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl
-                            bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/40 mb-4 text-indigo-500 dark:text-indigo-400 transition-colors">
-              <ShieldIcon />
-            </div>
-            <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Create Account</h1>
-            <p className="text-slate-500 dark:text-gray-400 mt-1 text-sm">Join DeepGuard AI today — it's free</p>
+      {/* ── Left panel ── */}
+      <div style={styles.left}>
+        <div style={styles.logo}>
+          <div style={styles.logoIcon}>
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
           </div>
-
-          {formError && (
-            <div className="mb-4">
-              <Alert message={formError} type="error" onDismiss={clearError} />
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name */}
-            <div>
-              <label className="block text-sm text-slate-600 dark:text-gray-300 mb-1.5 font-medium">Display Name</label>
-              <input
-                type="text"
-                id="signup-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                autoComplete="name"
-                className="input-field"
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm text-slate-600 dark:text-gray-300 mb-1.5 font-medium">Email</label>
-              <input
-                type="email"
-                id="signup-email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                autoComplete="email"
-                className="input-field"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm text-slate-600 dark:text-gray-300 mb-1.5 font-medium">Password</label>
-              <div className="relative">
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  id="signup-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min. 6 characters"
-                  required
-                  minLength={6}
-                  autoComplete="new-password"
-                  className="input-field pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300 transition-colors"
-                >
-                  <EyeIcon open={showPass} />
-                </button>
-              </div>
-              <PasswordStrength password={password} />
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm text-slate-600 dark:text-gray-300 mb-1.5 font-medium">Confirm Password</label>
-              <input
-                type={showPass ? 'text' : 'password'}
-                id="signup-confirm"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                placeholder="Repeat password"
-                required
-                autoComplete="new-password"
-                className={`input-field ${confirm && confirm !== password
-                  ? 'border-red-400 focus:border-red-500'
-                  : confirm && confirm === password
-                    ? 'border-emerald-400 focus:border-emerald-500'
-                    : ''
-                  }`}
-              />
-              {confirm && confirm !== password && (
-                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              id="signup-submit"
-              disabled={isSubmitting}
-              className="btn-primary w-full mt-6 flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Creating account…
-                </>
-              ) : (
-                'Create Account'
-              )}
-            </button>
-          </form>
-
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-slate-200 dark:bg-[#262626]" />
-            <span className="text-slate-400 dark:text-gray-500 font-semibold text-xs border border-slate-200 dark:border-[#262626] bg-slate-50 dark:bg-[#171717] px-2 py-1 rounded-full">ALREADY HAVE ONE?</span>
-            <div className="flex-1 h-px bg-slate-200 dark:bg-[#262626]" />
-          </div>
-
-          <Link
-            to="/login"
-            className="block text-center py-3 px-6 rounded-xl border border-slate-200 dark:border-[#262626]
-                       text-slate-600 dark:text-gray-400 dark:hover:text-white dark:hover:border-[#404040] hover:text-slate-800 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-[#1A1A1A]
-                       transition-all duration-200 font-medium text-sm shadow-sm"
-          >
-            Sign in instead
-          </Link>
+          <span style={styles.logoName}>DeepGuard AI</span>
         </div>
 
-        <p className="text-center text-slate-500 dark:text-gray-500 text-xs mt-5">
-          🔒 Secured with Firebase Authentication
-        </p>
-      </motion.div>
+        <div style={styles.leftBody}>
+          <div style={styles.tag}>
+            <div style={styles.tagDot} />
+            Threat intelligence platform
+          </div>
+          <h1 style={styles.leftTitle}>Detect threats<br />before they<br />become damage.</h1>
+          <p style={styles.leftSub}>
+            AI-powered analysis protecting your infrastructure around the clock. Free to start.
+          </p>
+          <div style={styles.pills}>
+            {['AI-powered', 'Zero-day detection', 'SOC integration', 'GDPR ready'].map(f => (
+              <span key={f} style={styles.pill}>{f}</span>
+            ))}
+          </div>
+          <div style={styles.socialProof}>
+            <div style={styles.stars}>
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} width="13" height="13" viewBox="0 0 20 20" fill="#EF9F27">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <p style={styles.trustText}>Trusted by <span style={{ color: '#0A0A0A', fontWeight: 500 }}>12,000+</span> security teams</p>
+          </div>
+        </div>
+
+        <div style={styles.leftFoot}>ISO 27001 · GDPR compliant</div>
+      </div>
+
+      {/* ── Right panel ── */}
+      <div style={styles.right}>
+        <div style={styles.step}>Create account</div>
+
+        <h2 style={styles.rTitle}>Get started free</h2>
+        <p style={styles.rSub}>No credit card required</p>
+
+        {formError && (
+          <div style={styles.errBox}>
+            {formError}
+            <button onClick={clearError} style={styles.errClose} aria-label="Dismiss">✕</button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+
+          {/* Name */}
+          <div style={styles.field}>
+            <label style={styles.flabel}>Full name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="John Doe"
+              autoComplete="name"
+              style={styles.inp}
+              onFocus={focusTeal}
+              onBlur={blurGray}
+            />
+          </div>
+
+          {/* Email */}
+          <div style={styles.field}>
+            <label style={styles.flabel}>Email address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              required
+              autoComplete="email"
+              style={styles.inp}
+              onFocus={focusTeal}
+              onBlur={blurGray}
+            />
+          </div>
+
+          {/* Password */}
+          <div style={styles.field}>
+            <div style={styles.flabelRow}>
+              <label style={styles.flabel}>Password</label>
+              <button
+                type="button"
+                onClick={() => setShowPass(v => !v)}
+                style={styles.showBtn}
+              >
+                {showPass ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <input
+              type={showPass ? 'text' : 'password'}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Min. 6 characters"
+              required
+              minLength={6}
+              autoComplete="new-password"
+              style={styles.inp}
+              onFocus={focusTeal}
+              onBlur={blurGray}
+            />
+            <PasswordStrength password={password} />
+          </div>
+
+          {/* Confirm Password */}
+          <div style={styles.field}>
+            <label style={styles.flabel}>Confirm password</label>
+            <input
+              type={showPass ? 'text' : 'password'}
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              placeholder="Repeat password"
+              required
+              autoComplete="new-password"
+              style={{
+                ...styles.inp,
+                borderColor: passwordMismatch ? '#E24B4A' : passwordMatch ? '#1D9E75' : '#EBEBEB',
+              }}
+              onFocus={e => {
+                if (!passwordMismatch && !passwordMatch) e.target.style.borderColor = '#1D9E75'
+              }}
+              onBlur={e => {
+                if (!passwordMismatch && !passwordMatch) e.target.style.borderColor = '#EBEBEB'
+              }}
+            />
+            {passwordMismatch && (
+              <p style={{ fontSize: 11, color: '#E24B4A', marginTop: 5, fontWeight: 400 }}>
+                Passwords do not match
+              </p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            style={{
+              ...styles.btn,
+              opacity: isSubmitting ? 0.7 : 1,
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            }}
+            onMouseEnter={e => !isSubmitting && (e.currentTarget.style.background = '#222')}
+            onMouseLeave={e => e.currentTarget.style.background = '#0A0A0A'}
+          >
+            {isSubmitting ? (
+              <>
+                <span style={styles.spinner} />
+                Creating account…
+              </>
+            ) : (
+              <>
+                Create account
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </>
+            )}
+          </button>
+        </form>
+
+        <div style={styles.divRow}>
+          <div style={styles.divLine} />
+          <span style={styles.divTxt}>Already have an account?</span>
+          <div style={styles.divLine} />
+        </div>
+
+        <Link to="/login" style={styles.signinBtn}>
+          Sign in instead
+        </Link>
+      </div>
     </div>
   )
+}
+
+const styles = {
+  root: {
+    minHeight: '100vh',
+    background: '#fff',
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    fontFamily: "'Inter', system-ui, sans-serif",
+  },
+
+  /* ── Left ── */
+  left: {
+    background: '#F5F5F3',
+    padding: '56px 52px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  logo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoIcon: {
+    width: 36,
+    height: 36,
+    background: '#0A0A0A',
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoName: {
+    fontSize: 15,
+    fontWeight: 500,
+    color: '#0A0A0A',
+    letterSpacing: '-0.2px',
+  },
+  leftBody: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '40px 0',
+  },
+  tag: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    background: '#E8F5F0',
+    color: '#0F6E56',
+    fontSize: 11,
+    fontWeight: 500,
+    padding: '5px 10px',
+    borderRadius: 20,
+    marginBottom: 28,
+    width: 'fit-content',
+  },
+  tagDot: {
+    width: 6,
+    height: 6,
+    background: '#1D9E75',
+    borderRadius: '50%',
+  },
+  leftTitle: {
+    fontSize: 36,
+    fontWeight: 600,
+    color: '#0A0A0A',
+    lineHeight: 1.15,
+    letterSpacing: '-1.1px',
+    marginBottom: 16,
+  },
+  leftSub: {
+    fontSize: 14,
+    color: '#888',
+    lineHeight: 1.65,
+    fontWeight: 300,
+    maxWidth: 280,
+  },
+  pills: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 28,
+  },
+  pill: {
+    fontSize: 12,
+    color: '#555',
+    padding: '6px 14px',
+    border: '1px solid #E0E0E0',
+    borderRadius: 20,
+    background: '#fff',
+    fontWeight: 400,
+  },
+  socialProof: {
+    marginTop: 32,
+  },
+  stars: {
+    display: 'flex',
+    gap: 2,
+    marginBottom: 6,
+  },
+  trustText: {
+    fontSize: 12,
+    color: '#999',
+    fontWeight: 300,
+  },
+  leftFoot: {
+    fontSize: 11,
+    color: '#bbb',
+    letterSpacing: '0.02em',
+  },
+
+  /* ── Right ── */
+  right: {
+    padding: '48px 52px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    maxWidth: 480,
+    margin: '0 auto',
+    width: '100%',
+  },
+  step: {
+    fontSize: 11,
+    color: '#bbb',
+    fontWeight: 500,
+    letterSpacing: '0.1em',
+    textTransform: 'uppercase',
+    marginBottom: 28,
+  },
+  rTitle: {
+    fontSize: 28,
+    fontWeight: 600,
+    color: '#0A0A0A',
+    letterSpacing: '-0.7px',
+    marginBottom: 6,
+  },
+  rSub: {
+    fontSize: 14,
+    color: '#999',
+    fontWeight: 300,
+    marginBottom: 32,
+  },
+  errBox: {
+    background: '#FEF2F2',
+    border: '1px solid #FECACA',
+    color: '#991B1B',
+    fontSize: 13,
+    padding: '10px 14px',
+    borderRadius: 8,
+    marginBottom: 20,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  errClose: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#991B1B',
+    fontSize: 13,
+    padding: '0 0 0 8px',
+  },
+  field: {
+    marginBottom: 18,
+  },
+  flabelRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 7,
+  },
+  flabel: {
+    fontSize: 12,
+    fontWeight: 500,
+    color: '#444',
+    marginBottom: 7,
+    display: 'block',
+  },
+  showBtn: {
+    fontSize: 11,
+    color: '#1D9E75',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    padding: 0,
+  },
+  inp: {
+    width: '100%',
+    height: 46,
+    border: '1.5px solid #EBEBEB',
+    borderRadius: 10,
+    padding: '0 14px',
+    fontSize: 14,
+    fontFamily: 'inherit',
+    color: '#0A0A0A',
+    background: '#fff',
+    outline: 'none',
+    transition: 'border-color 0.18s',
+    fontWeight: 300,
+  },
+  btn: {
+    width: '100%',
+    height: 48,
+    background: '#0A0A0A',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 10,
+    fontSize: 14,
+    fontWeight: 500,
+    fontFamily: 'inherit',
+    cursor: 'pointer',
+    marginTop: 8,
+    letterSpacing: '-0.1px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    transition: 'background 0.18s',
+  },
+  spinner: {
+    width: 16,
+    height: 16,
+    border: '2px solid rgba(255,255,255,0.3)',
+    borderTopColor: '#fff',
+    borderRadius: '50%',
+    animation: 'spin 0.7s linear infinite',
+  },
+  divRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    margin: '24px 0',
+  },
+  divLine: {
+    flex: 1,
+    height: 1,
+    background: '#F0F0F0',
+  },
+  divTxt: {
+    fontSize: 11,
+    color: '#ccc',
+    whiteSpace: 'nowrap',
+  },
+  signinBtn: {
+    width: '100%',
+    height: 46,
+    background: '#fff',
+    color: '#0A0A0A',
+    border: '1.5px solid #EBEBEB',
+    borderRadius: 10,
+    fontSize: 14,
+    fontFamily: 'inherit',
+    cursor: 'pointer',
+    fontWeight: 400,
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'border-color 0.18s, background 0.18s',
+  },
 }
