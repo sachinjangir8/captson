@@ -1,12 +1,11 @@
 import { useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import VideoDropzone from '../components/VideoDropzone'
 import ResultCard from '../components/ResultCard'
 import ExplanationPanel from '../components/ExplanationPanel'
 import FrameTimeline from '../components/FrameTimeline'
 import ConfidenceBreakdown from '../components/ConfidenceBreakdown'
-import Alert from '../components/Alert'
 import { useVideoAnalysis } from '../hooks/useVideoAnalysis'
 
 export default function DashboardPage() {
@@ -17,233 +16,507 @@ export default function DashboardPage() {
   } = useVideoAnalysis()
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0A] flex flex-col transition-colors">
+    <div style={styles.root}>
       <Navbar />
 
-      <main className="flex-1 max-w-3xl mx-auto w-full px-5 sm:px-8 py-16 sm:py-24">
-        
-        {/* ── Hero Section ────────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center mb-12 sm:mb-16"
-        >
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#111827] dark:text-white mb-5 tracking-tight">
-            Detect Deepfake Videos in Seconds
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Upload any video to securely analyze it for signs of manipulation. 
-            Our advanced models provide a simple, definitive verdict.
+      <main style={styles.main}>
+
+        {/* ── Hero ── */}
+        <div style={styles.hero}>
+          <div style={styles.heroBadge}>
+            <div style={styles.heroBadgeDot} />
+            AI-powered deepfake detection
+          </div>
+          <h1 style={styles.heroTitle}>Detect deepfake videos<br />in seconds.</h1>
+          <p style={styles.heroSub}>
+            Upload any video to analyze it for signs of manipulation.
+            Advanced models provide a clear, definitive verdict.
           </p>
-        </motion.div>
-
-        {/* ── Main Workspace ──────────────────────────────────────────────── */}
-        <div className="space-y-8">
-          
-          {/* Upload Panel */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-            className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#262626] shadow-sm p-6 sm:p-8 transition-colors"
-          >
-            <VideoDropzone
-              videoFile={videoFile}
-              onFileSelect={selectFile}
-              onReset={reset}
-              disabled={isLoading}
-            />
-
-            <AnimatePresence>
-              {error && !isLoading && (
-                <div className="mt-4">
-                  <Alert message={error} type="error" />
-                </div>
-              )}
-            </AnimatePresence>
-
-            {/* Video preview */}
-            <AnimatePresence>
-              {videoURL && (
-                <motion.div
-                  key="video-preview"
-                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
-                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                  className="overflow-hidden"
-                >
-                  <label className="block text-gray-500 dark:text-gray-400 text-sm mb-2 font-medium">Preview</label>
-                  <video
-                    key={videoURL}
-                    controls
-                    preload="auto"
-                    className="w-full rounded-lg border border-gray-200 dark:border-[#262626] max-h-60 object-contain bg-gray-50/50 dark:bg-[#111111]/50 shadow-sm"
-                  >
-                    <source src={videoURL} type={videoFile?.type || 'video/mp4'} />
-                    Your browser does not support the video tag.
-                  </video>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Upload Progress */}
-            <AnimatePresence>
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
-                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600 dark:text-gray-400 font-medium tracking-tight">
-                      {uploadProgress < 100 ? 'Uploading content...' : 'Analyzing video...'}
-                    </span>
-                    {uploadProgress < 100 && (
-                      <span className="text-[#0F172A] dark:text-gray-200 font-medium">{uploadProgress}%</span>
-                    )}
-                  </div>
-                  <div className="w-full h-1.5 bg-gray-100 dark:bg-[#262626] rounded-full overflow-hidden">
-                    {uploadProgress < 100 ? (
-                      <motion.div
-                        className="h-full bg-[#0F172A] dark:bg-white rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${uploadProgress}%` }}
-                        transition={{ ease: 'linear' }}
-                      />
-                    ) : (
-                      <div className="h-full bg-[#0F172A] dark:bg-white rounded-full animate-pulse w-full opacity-60" />
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Analyze Button */}
-            <div className="mt-8">
-              <button
-                id="analyze-btn"
-                onClick={analyze}
-                disabled={!hasFile || isLoading}
-                className="btn-primary w-full flex items-center justify-center gap-2 text-base h-12"
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing
-                  </>
-                ) : (
-                  'Analyze Video'
-                )}
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Results Panel */}
-          <AnimatePresence>
-            {result && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="space-y-6"
-              >
-                <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#262626] shadow-sm p-6 sm:p-8 transition-colors">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Results</h2>
-                  <ResultCard result={result} />
-                </div>
-
-                {/* XAI Components */}
-                {(result.frame_scores?.length > 0 || result.explanations?.length > 0 || result.confidence_breakdown) && (
-                  <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#262626] shadow-sm p-6 sm:p-8 space-y-8 transition-colors">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Detailed Analysis</h2>
-                    
-                    {result.frame_scores && result.frame_scores.length > 0 && (
-                      <FrameTimeline
-                        frameScores={result.frame_scores}
-                        suspiciousFrames={result.suspicious_frames}
-                      />
-                    )}
-
-                    {result.explanations && result.explanations.length > 0 && (
-                      <ExplanationPanel
-                        explanations={result.explanations}
-                        prediction={result.prediction}
-                      />
-                    )}
-
-                    <ConfidenceBreakdown
-                      confidenceBreakdown={result.confidence_breakdown}
-                      warnings={result.warnings}
-                    />
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
-        {/* ── How It Works ────────────────────────────────────────────────── */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-24 sm:mt-32"
-        >
-          <div className="text-center mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">How It Works</h2>
+        {/* ── Upload Panel ── */}
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <span style={styles.cardLabel}>01 — Upload</span>
+            <span style={styles.cardTitle}>Select a video file</span>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center sm:text-left">
+
+          <VideoDropzone
+            videoFile={videoFile}
+            onFileSelect={selectFile}
+            onReset={reset}
+            disabled={isLoading}
+          />
+
+          {/* Error */}
+          {error && !isLoading && (
+            <div style={styles.errBox}>
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ flexShrink: 0 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+              {error}
+            </div>
+          )}
+
+          {/* Video Preview */}
+          {videoURL && (
+            <div style={{ marginTop: 20 }}>
+              <p style={styles.previewLabel}>Preview</p>
+              <video
+                key={videoURL}
+                controls
+                preload="auto"
+                style={styles.videoPreview}
+              >
+                <source src={videoURL} type={videoFile?.type || 'video/mp4'} />
+              </video>
+            </div>
+          )}
+
+          {/* Progress */}
+          {isLoading && (
+            <div style={{ marginTop: 20 }}>
+              <div style={styles.progressRow}>
+                <span style={styles.progressLabel}>
+                  {uploadProgress < 100 ? 'Uploading…' : 'Analyzing video…'}
+                </span>
+                {uploadProgress < 100 && (
+                  <span style={styles.progressPct}>{uploadProgress}%</span>
+                )}
+              </div>
+              <div style={styles.progressTrack}>
+                <div style={{
+                  ...styles.progressFill,
+                  width: uploadProgress < 100 ? `${uploadProgress}%` : '100%',
+                  opacity: uploadProgress >= 100 ? 0.5 : 1,
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Analyze Button */}
+          <div style={{ marginTop: 28 }}>
+            <button
+              id="analyze-btn"
+              onClick={analyze}
+              disabled={!hasFile || isLoading}
+              style={{
+                ...styles.btn,
+                opacity: !hasFile || isLoading ? 0.5 : 1,
+                cursor: !hasFile || isLoading ? 'not-allowed' : 'pointer',
+              }}
+              onMouseEnter={e => { if (hasFile && !isLoading) e.currentTarget.style.background = '#222' }}
+              onMouseLeave={e => e.currentTarget.style.background = '#0A0A0A'}
+            >
+              {isLoading ? (
+                <>
+                  <span style={styles.spinner} />
+                  Processing…
+                </>
+              ) : (
+                <>
+                  Analyze Video
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Results ── */}
+        {result && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            <div style={styles.card}>
+              <div style={styles.cardHeader}>
+                <span style={styles.cardLabel}>02 — Result</span>
+                <span style={styles.cardTitle}>Verdict</span>
+              </div>
+              <ResultCard result={result} />
+            </div>
+
+            {(result.frame_scores?.length > 0 || result.explanations?.length > 0 || result.confidence_breakdown) && (
+              <div style={styles.card}>
+                <div style={styles.cardHeader}>
+                  <span style={styles.cardLabel}>03 — Analysis</span>
+                  <span style={styles.cardTitle}>Detailed breakdown</span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+                  {result.frame_scores?.length > 0 && (
+                    <FrameTimeline
+                      frameScores={result.frame_scores}
+                      suspiciousFrames={result.suspicious_frames}
+                    />
+                  )}
+                  {result.explanations?.length > 0 && (
+                    <ExplanationPanel
+                      explanations={result.explanations}
+                      prediction={result.prediction}
+                    />
+                  )}
+                  <ConfidenceBreakdown
+                    confidenceBreakdown={result.confidence_breakdown}
+                    warnings={result.warnings}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── How It Works ── */}
+        <section style={styles.howSection}>
+          <div style={styles.howHeader}>
+            <span style={styles.cardLabel}>Process</span>
+            <h2 style={styles.howTitle}>How it works</h2>
+          </div>
+
+          <div style={styles.stepsGrid}>
             {[
-              { 
-                step: '1', 
-                title: 'Upload File',   
-                desc: 'Select any suspicious video file. We support most standard formats like MP4, MOV, and AVI.' 
+              {
+                step: '01',
+                title: 'Upload file',
+                desc: 'Select any suspicious video. We support MP4, MOV, AVI and most standard formats.',
               },
-              { 
-                step: '2', 
-                title: 'AI Analysis', 
-                desc: 'Our models extract frames to detect unnatural facial movements and artifacts simultaneously.' 
+              {
+                step: '02',
+                title: 'AI analysis',
+                desc: 'Our models extract frames to detect unnatural facial movements and manipulation artifacts.',
               },
-              { 
-                step: '3', 
-                title: 'Get Results',  
-                desc: 'Review the confidence score and access an explainable timeline breakdown of the findings.' 
+              {
+                step: '03',
+                title: 'Get results',
+                desc: 'Review the confidence score and access an explainable timeline breakdown of findings.',
               },
             ].map(({ step, title, desc }) => (
-              <div key={step} className="flex flex-col items-center sm:items-start group">
-                <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#262626] flex items-center justify-center text-gray-900 dark:text-gray-200 font-medium mb-4 group-hover:bg-[#0F172A] dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-colors duration-300">
-                  {step}
-                </div>
-                <h3 className="text-gray-900 dark:text-white font-medium text-base mb-2">{title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{desc}</p>
+              <div key={step} style={styles.stepCard}>
+                <div style={styles.stepNum}>{step}</div>
+                <div style={styles.stepDivider} />
+                <h3 style={styles.stepTitle}>{title}</h3>
+                <p style={styles.stepDesc}>{desc}</p>
               </div>
             ))}
           </div>
-        </motion.section>
+        </section>
+
       </main>
 
-      {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="border-t border-gray-200 dark:border-[#262626] bg-white dark:bg-[#0A0A0A] mt-auto transition-colors">
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
-          <p>© 2026 Deepfake Detector. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">About</a>
-            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-1.5">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"></path></svg>
-              GitHub
-            </a>
+      {/* ── Footer ── */}
+      <footer style={styles.footer}>
+        <div style={styles.footerInner}>
+          <div style={styles.footerLeft}>
+            <div style={styles.footerLogo}>
+              <div style={styles.footerLogoIcon}>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <span style={styles.footerLogoName}>DeepGuard AI</span>
+            </div>
+            <p style={styles.footerCopy}>© 2026 DeepGuard AI. All rights reserved.</p>
+          </div>
+          <div style={styles.footerLinks}>
+            {['About', 'Privacy', 'GitHub'].map(l => (
+              <a key={l} href="#" style={styles.footerLink}
+                onMouseEnter={e => e.currentTarget.style.color = '#0A0A0A'}
+                onMouseLeave={e => e.currentTarget.style.color = '#bbb'}
+              >{l}</a>
+            ))}
           </div>
         </div>
       </footer>
     </div>
   )
+}
+
+const styles = {
+  root: {
+    minHeight: '100vh',
+    background: '#F5F5F3',
+    display: 'flex',
+    flexDirection: 'column',
+    fontFamily: "'Inter', system-ui, sans-serif",
+  },
+  main: {
+    flex: 1,
+    maxWidth: 720,
+    margin: '0 auto',
+    width: '100%',
+    padding: '64px 24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 20,
+  },
+
+  /* ── Hero ── */
+  hero: {
+    marginBottom: 12,
+  },
+  heroBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    background: '#E8F5F0',
+    color: '#0F6E56',
+    fontSize: 11,
+    fontWeight: 500,
+    padding: '5px 10px',
+    borderRadius: 20,
+    marginBottom: 20,
+    width: 'fit-content',
+  },
+  heroBadgeDot: {
+    width: 6,
+    height: 6,
+    background: '#1D9E75',
+    borderRadius: '50%',
+  },
+  heroTitle: {
+    fontSize: 40,
+    fontWeight: 600,
+    color: '#0A0A0A',
+    lineHeight: 1.15,
+    letterSpacing: '-1.2px',
+    marginBottom: 14,
+  },
+  heroSub: {
+    fontSize: 15,
+    color: '#888',
+    lineHeight: 1.65,
+    fontWeight: 300,
+    maxWidth: 480,
+  },
+
+  /* ── Card ── */
+  card: {
+    background: '#fff',
+    border: '1px solid #EBEBEB',
+    borderRadius: 14,
+    padding: '32px 36px',
+  },
+  cardHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+    marginBottom: 24,
+    paddingBottom: 20,
+    borderBottom: '1px solid #F0F0F0',
+  },
+  cardLabel: {
+    fontSize: 10,
+    fontWeight: 500,
+    color: '#bbb',
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#0A0A0A',
+    letterSpacing: '-0.2px',
+  },
+
+  /* ── Error ── */
+  errBox: {
+    marginTop: 16,
+    background: '#FEF2F2',
+    border: '1px solid #FECACA',
+    color: '#991B1B',
+    fontSize: 13,
+    padding: '10px 14px',
+    borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  /* ── Video Preview ── */
+  previewLabel: {
+    fontSize: 12,
+    fontWeight: 500,
+    color: '#888',
+    marginBottom: 8,
+  },
+  videoPreview: {
+    width: '100%',
+    borderRadius: 10,
+    border: '1px solid #EBEBEB',
+    maxHeight: 260,
+    objectFit: 'contain',
+    background: '#FAFAFA',
+  },
+
+  /* ── Progress ── */
+  progressRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressLabel: {
+    fontSize: 13,
+    color: '#555',
+    fontWeight: 400,
+  },
+  progressPct: {
+    fontSize: 13,
+    color: '#0A0A0A',
+    fontWeight: 500,
+  },
+  progressTrack: {
+    width: '100%',
+    height: 3,
+    background: '#F0F0F0',
+    borderRadius: 99,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    background: '#1D9E75',
+    borderRadius: 99,
+    transition: 'width 0.3s ease',
+  },
+
+  /* ── Button ── */
+  btn: {
+    width: '100%',
+    height: 48,
+    background: '#0A0A0A',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 10,
+    fontSize: 14,
+    fontWeight: 500,
+    fontFamily: 'inherit',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    transition: 'background 0.18s',
+  },
+  spinner: {
+    width: 16,
+    height: 16,
+    border: '2px solid rgba(255,255,255,0.3)',
+    borderTopColor: '#fff',
+    borderRadius: '50%',
+    animation: 'spin 0.7s linear infinite',
+    flexShrink: 0,
+  },
+
+  /* ── How It Works ── */
+  howSection: {
+    marginTop: 32,
+    paddingTop: 40,
+    borderTop: '1px solid #E8E8E8',
+  },
+  howHeader: {
+    marginBottom: 28,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  howTitle: {
+    fontSize: 22,
+    fontWeight: 600,
+    color: '#0A0A0A',
+    letterSpacing: '-0.5px',
+  },
+  stepsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 16,
+  },
+  stepCard: {
+    background: '#fff',
+    border: '1px solid #EBEBEB',
+    borderRadius: 12,
+    padding: '24px 20px',
+  },
+  stepNum: {
+    fontFamily: "'Space Mono', monospace, system-ui",
+    fontSize: 11,
+    color: '#1D9E75',
+    fontWeight: 400,
+    marginBottom: 14,
+    letterSpacing: '0.04em',
+  },
+  stepDivider: {
+    width: 24,
+    height: 2,
+    background: '#F0F0F0',
+    borderRadius: 99,
+    marginBottom: 14,
+  },
+  stepTitle: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#0A0A0A',
+    marginBottom: 8,
+    letterSpacing: '-0.2px',
+  },
+  stepDesc: {
+    fontSize: 13,
+    color: '#999',
+    lineHeight: 1.6,
+    fontWeight: 300,
+  },
+
+  /* ── Footer ── */
+  footer: {
+    borderTop: '1px solid #E8E8E8',
+    background: '#fff',
+    marginTop: 'auto',
+  },
+  footerInner: {
+    maxWidth: 720,
+    margin: '0 auto',
+    padding: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  footerLeft: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+  },
+  footerLogo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+  },
+  footerLogoIcon: {
+    width: 26,
+    height: 26,
+    background: '#0A0A0A',
+    borderRadius: 7,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerLogoName: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: '#0A0A0A',
+    letterSpacing: '-0.1px',
+  },
+  footerCopy: {
+    fontSize: 11,
+    color: '#bbb',
+  },
+  footerLinks: {
+    display: 'flex',
+    gap: 24,
+  },
+  footerLink: {
+    fontSize: 13,
+    color: '#bbb',
+    textDecoration: 'none',
+    transition: 'color 0.15s',
+  },
 }
